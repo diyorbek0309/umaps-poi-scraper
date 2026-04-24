@@ -13,16 +13,26 @@ const PRESET = process.argv[2] || 'atm';
 const VILOYAT = process.argv[3] || 'toshkent_sh';
 
 const PRESETS = {
-  atm:       { queries: ['банкомат', 'ATM'],                                    category: 'atm'           },
-  fuel:      { queries: ['АЗС', 'заправка', 'метановая заправка'],              category: 'fuel'          },
-  pharmacy:  { queries: ['аптека', 'дорихона'],                                 category: 'pharmacy'      },
-  parking:   { queries: ['парковка', 'автостоянка'],                            category: 'parking'       },
-  groceries: { queries: ['супермаркет', 'Корзинка', 'Макро', 'Havas'],          category: 'groceries'     },
-  banks:     { queries: ['банк', 'обмен валют'],                                category: 'finance'       },
-  hotels:    { queries: ['гостиница', 'отель', 'хостел'],                       category: 'accommodation' },
-  healthcare:{ queries: ['больница', 'клиника', 'поликлиника'],                 category: 'healthcare'    },
-  food:      { queries: ['ресторан', 'кафе', 'чайхана'],                        category: 'food_and_drink'},
-  religion:  { queries: ['мечеть', 'масджид', 'джума мечеть', 'церковь', 'синагога'], category: 'religion' },
+  atm:            { queries: ['банкомат', 'ATM'],                                                 category: 'atm'             },
+  fuel:           { queries: ['АЗС', 'заправка', 'метановая заправка'],                           category: 'fuel'            },
+  pharmacy:       { queries: ['аптека', 'дорихона'],                                              category: 'pharmacy'        },
+  parking:        { queries: ['парковка', 'автостоянка'],                                         category: 'parking'         },
+  groceries:      { queries: ['супермаркет', 'Корзинка', 'Макро', 'Havas'],                       category: 'groceries'       },
+  banks:          { queries: ['банк', 'обмен валют'],                                             category: 'finance'         },
+  hotels:         { queries: ['гостиница', 'отель', 'хостел'],                                    category: 'accommodation'   },
+  healthcare:     { queries: ['больница', 'клиника', 'поликлиника', 'стоматология'],              category: 'healthcare'      },
+  food:           { queries: ['ресторан', 'кафе', 'чайхана', 'фастфуд'],                          category: 'food_and_drink'  },
+  religion:       { queries: ['мечеть', 'масджид', 'джума мечеть', 'церковь', 'синагога'],        category: 'religion'        },
+  education:      { queries: ['школа', 'университет', 'детский сад', 'колледж', 'учебный центр'], category: 'education'       },
+  beauty:         { queries: ['салон красоты', 'барбершоп', 'парикмахерская', 'SPA', 'маникюр'],  category: 'beauty'          },
+  leisure_sport:  { queries: ['спортзал', 'фитнес', 'бассейн', 'стадион', 'кинотеатр'],           category: 'leisure_sport'   },
+  culture_tourism:{ queries: ['музей', 'театр', 'памятник', 'достопримечательность'],             category: 'culture_tourism' },
+  services:       { queries: ['ателье', 'ремонт', 'химчистка', 'почта', 'типография'],            category: 'services'        },
+  government:     { queries: ['хокимият', 'полиция', 'суд', 'ЗАГС', 'посольство'],                category: 'government'      },
+  automotive:     { queries: ['автосервис', 'шиномонтаж', 'автомойка', 'автосалон'],              category: 'automotive'      },
+  shopping:       { queries: ['магазин одежды', 'электроника', 'мебель', 'ТРЦ', 'торговый центр'],category: 'shopping'        },
+  transport:      { queries: ['автовокзал', 'аэропорт', 'метро', 'железнодорожный вокзал'],       category: 'transport'       },
+  nature:         { queries: ['парк', 'озеро', 'заповедник'],                                     category: 'nature'          },
 };
 
 // [minLng, minLat, maxLng, maxLat]

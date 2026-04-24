@@ -81,9 +81,19 @@ done
 | `groceries` | Oziq-ovqat do'konlari |
 | `banks` | Banklar |
 | `hotels` | Mehmonxonalar |
-| `healthcare` | Kasalxona/klinikalar |
-| `food` | Restoran/kafe |
+| `healthcare` | Kasalxona/klinikalar/stomatologiya |
+| `food` | Restoran/kafe/chayxona |
 | `religion` | Masjid/cherkov/ibodatxona |
+| `education` | Maktab/universitet/bolalar bog'chasi |
+| `beauty` | Go'zallik salonlari/sartaroshxona/SPA |
+| `leisure_sport` | Sport/fitnes/basseyn/kino |
+| `culture_tourism` | Muzey/teatr/yodgorlik |
+| `services` | Maishiy xizmatlar (ta'mir, pochta) |
+| `government` | Davlat xizmatlari (hokimiyat, IIB) |
+| `automotive` | Avtoservis/shinomontaj/avtomoyka |
+| `shopping` | Kiyim/elektronika/mebel/TRC |
+| `transport` | Avtovokzal/aeroport/metro |
+| `nature` | Park/ko'l/qo'riqxona |
 
 ---
 

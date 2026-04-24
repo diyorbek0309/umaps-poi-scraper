@@ -12,11 +12,9 @@ http-test-result.json
 # Yandex API debug
 yandex-api-responses/
 
-# POI natijalar — har odamniki alohida
-data/*-grid.json
-data/*-grid-progress.json
-data/*-http.json
-data/*-http-progress.json
+# Barcha POI natija va progress fayllar — har odamniki alohida
+data/*.json
+!data/.gitkeep
 
 # Katta screenshot lar
 zoom-screenshots/
