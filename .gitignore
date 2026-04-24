@@ -4,3 +4,19 @@ debug-*.png
 poi-results.json
 tashkent-pois.json
 phase1-progress.json
+
+# Session — cookie sensitive
+data/session.json
+http-test-result.json
+
+# Yandex API debug
+yandex-api-responses/
+
+# POI natijalar — har odamniki alohida
+data/*-grid.json
+data/*-grid-progress.json
+data/*-http.json
+data/*-http-progress.json
+
+# Katta screenshot lar
+zoom-screenshots/

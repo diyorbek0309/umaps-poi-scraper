@@ -189,3 +189,137 @@ console.log('Merged:', merged.length, 'unikal POI');
 | ATM | `data/atm-uzbekistan-merged.json` | 5,151 |
 | Fuel | `data/fuel-uzbekistan-merged.json` | 1,137 |
 | Religion | `data/religion-uzbekistan-*.json` | jarayonda |
+
+---
+
+# 🚀 Grid Scraper (yangi, tezroq) — JAMOA UCHUN
+
+Yangi `grid-scraper.js` browsersiz HTTP + adaptive quadtree algoritm ishlatadi.
+Browser-based scraperdan **2-3x ko'proq POI**, **3x tezroq**.
+
+## Algoritm
+
+1. Viloyat bbox bo'yicha qidiradi (Yandex 25 item limit)
+2. Agar 25 ga yetsa — bbox 4 ga bo'linadi (NW, NE, SW, SE)
+3. Har sub-cell uchun rekursiv → 1km gacha
+4. Kafolat: hech POI tushib qolmaydi
+
+## O'rnatish (jamoadoshlar uchun)
+
+```bash
+git clone https://github.com/diyorbek0309/u-maps-scraper.git
+cd u-maps-scraper
+npm install
+npx playwright install chromium
+```
+
+## Ishga tushirish
+
+### 1-qadam: Session yaratish (1 marta, 2 soatga amal qiladi)
+
+```bash
+node session.js
+```
+
+Brauzer ochiladi → CAPTCHA chiqsa yoching → avtomatik yopiladi.
+`data/session.json` yaratiladi.
+
+### 2-qadam: Scraper ishga tushirish
+
+```bash
+node grid-scraper.js <preset> <viloyat>
+```
+
+Misol:
+```bash
+node grid-scraper.js atm samarqand
+node grid-scraper.js pharmacy buxoro
+node grid-scraper.js food toshkent_sh
+```
+
+### 3-qadam: Bir necha viloyat ketma-ket
+
+```bash
+for v in samarqand buxoro navoiy; do
+  node grid-scraper.js atm $v
+done
+```
+
+## Viloyat kalitlari
+
+`toshkent_sh`, `toshkent_v`, `samarqand`, `buxoro`, `namangan`, `andijon`,
+`fargona`, `qashqadaryo`, `surxondaryo`, `xorazm`, `navoiy`, `jizzax`,
+`sirdaryo`, `qoraqalpog`
+
+## Jamoa taqsimoti (tavsiya)
+
+Har kim o'z laptopidan ishlatadi (turli IP → CAPTCHA bottleneck yo'q).
+
+| Jamoadosh | Viloyatlar |
+|-----------|-----------|
+| Sanat Ullixo'jayev | toshkent_sh, toshkent_v |
+| Shaxruh Atanazarov | samarqand, buxoro, navoiy |
+| Muxriddin Satipboyev | fargona, andijon, namangan |
+| Diyorbek Boltayev | qashqadaryo, surxondaryo |
+| Diyorbek Olimov | xorazm, qoraqalpog, jizzax, sirdaryo |
+
+## CAPTCHA holat
+
+Har 250-300 requestdan keyin CAPTCHA chiqishi mumkin:
+
+```
+⚠️  CAPTCHA! Session muddati tugadi.
+Progress saqlandi. Davom etish uchun:
+  1. node session.js                            ← yangi session
+  2. node grid-scraper.js atm samarqand         ← resume
+```
+
+`session.json` ni yangilang, scraperni qayta ishga tushiring — tugagan
+joylar skip bo'ladi, qolgani davom etadi.
+
+## Natija fayllari
+
+```
+data/
+  atm-samarqand-grid.json           ← natija
+  atm-samarqand-grid-progress.json  ← progress (resume uchun)
+```
+
+## Birlashtirish (oxirida, 1 odam qiladi)
+
+Barcha jamoadoshlar fayllarini bir papkaga yig'ib:
+
+```bash
+node -e "
+const fs = require('fs');
+const path = require('path');
+const PRESET = 'atm';
+const seen = new Set();
+const merged = [];
+fs.readdirSync('./data')
+  .filter(f => f.startsWith(PRESET + '-') && f.endsWith('-grid.json'))
+  .forEach(f => {
+    const data = JSON.parse(fs.readFileSync(path.join('./data', f)));
+    data.forEach(p => {
+      if (!seen.has(p.yandexId)) { seen.add(p.yandexId); merged.push(p); }
+    });
+    console.log(f, '→', data.length);
+  });
+fs.writeFileSync('data/' + PRESET + '-uzbekistan-grid-merged.json', JSON.stringify(merged, null, 2));
+console.log('Merged:', merged.length);
+"
+```
+
+## Tezlik solishtirish
+
+| Strategiya | POI (Toshkent sh) | Vaqt | CAPTCHA |
+|-----------|------|------|---------|
+| Browser (eski) | ~250 | 30+ daq | Ha (manual) |
+| HTTP grid (yangi) | **619** | ~10 daq | Avtomatik handle |
+
+## Maslahatlar
+
+- **VPN yo'q** — Yandex bloklashi mumkin, real IP ishlating
+- **Headless emas** — session.js ekran yopilmasin
+- **Rate limit** — 250-450ms request orasi (tartibga keltirilgan)
+- **Resume har doim ishlaydi** — har yangi POI da fayl saqlanadi
