@@ -84,6 +84,16 @@ done
 | `healthcare` | Kasalxona/klinikalar |
 | `food` | Restoran/kafe |
 | `religion` | Masjid/cherkov/ibodatxona |
+| `education` | Maktab/universitet/bolalar bog'chasi |
+| `beauty` | Go'zallik saloni/barbershop/SPA |
+| `leisure_sport` | Sportzal/fitnes/basseyn/kinoteatr |
+| `culture_tourism` | Muzey/teatr/yodgorlik |
+| `services` | Atelye/ta'mir/ximchistka/pochta |
+| `government` | Hokimiyat/IIB/sud/ZAGS |
+| `automotive` | Avtoservis/shinomontaj/avtomoyka |
+| `shopping` | Kiyim/elektronika/mebel/TRK |
+| `transport` | Vokzal/aeroport/metro |
+| `nature` | Park/ko'l/qo'riqxona |
 
 ---
 
