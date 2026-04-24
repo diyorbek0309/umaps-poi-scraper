@@ -59,6 +59,23 @@ for v in samarqand buxoro navoiy; do
 done
 ```
 
+### 4-qadam (ixtiyoriy): To'liq detail (Phase 2)
+
+Grid scraper asosiy ma'lumot beradi (nom, manzil, koordinata, kategoriya).
+Telefon, ish vaqti, rasm, ijtimoiy tarmoq va xususiyatlar uchun:
+
+```bash
+node details-scraper.js atm-samarqand    # bitta fayl
+node details-scraper.js all              # barcha grid fayllar
+```
+
+Qo'shimcha maydonlar: `phones`, `workingHours`, `workingTimeRaw`,
+`rating`, `ratingCount`, `reviewCount`, `socialLinks`, `photos[]`,
+`logo`, `yandexCategories`, `features`, `featureGroups`, `chain`,
+`verified`, `businessProperties`.
+
+Tezlik: ~3-5 POI/sek. 619 POI ≈ 3-4 daqiqa.
+
 ---
 
 ## Algoritm
