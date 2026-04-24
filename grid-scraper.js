@@ -31,7 +31,7 @@ const PRESETS = {
   government:     { queries: ['хокимият', 'полиция', 'суд', 'ЗАГС', 'посольство'],                category: 'government'      },
   automotive:     { queries: ['автосервис', 'шиномонтаж', 'автомойка', 'автосалон'],              category: 'automotive'      },
   shopping:       { queries: ['магазин одежды', 'электроника', 'мебель', 'ТРЦ', 'торговый центр'],category: 'shopping'        },
-  transport:      { queries: ['автовокзал', 'аэропорт', 'метро', 'железнодорожный вокзал'],       category: 'transport'       },
+  transport:      { queries: ['вокзал', 'автовокзал', 'железнодорожный вокзал', 'аэропорт', 'метро'], category: 'transport'    },
   nature:         { queries: ['парк', 'озеро', 'заповедник'],                                     category: 'nature'          },
 };
 
