@@ -176,18 +176,75 @@ console.log('Merged:', merged.length);
 
 ## POI ma'lumot strukturasi
 
+### Phase 1 — `*-grid.json` (asosiy)
+
 ```json
 {
-  "yandexId": "1018907124",
-  "name": "Dori-Darmon",
-  "address": "Toshkent, Chilonzor, Bunyodkor ko'chasi 12",
-  "coordinates": { "lat": 41.2995, "lng": 69.2401 },
-  "category": "pharmacy",
-  "phones": ["+998 71 123-45-67"],
-  "workingHours": "Mo-Fr 09:00-20:00, Sa 10:00-18:00",
-  "rating": 4.3,
-  "reviewCount": 127,
-  "website": "https://doridarmon.uz"
+  "yandexId": "146209345047",
+  "name": "Uzum Bank",
+  "address": "Ташкент, 1-й проезд Дархан, 8A",
+  "coordinates": { "lat": 41.318337, "lng": 69.299149 },
+  "category": "atm",
+  "phones": ["+998787770799"],
+  "workingHours": "пн-пт 09:00–19:00",
+  "rating": null,
+  "reviewCount": 0,
+  "website": "https://uzumbank.uz/",
+  "_source": "yandex-grid"
+}
+```
+
+### Phase 2 — `*-detailed.json` (kengaytirilgan)
+
+```json
+{
+  "yandexId": "146209345047",
+  "name": "Uzum Bank",
+  "address": "Ташкент, 1-й проезд Дархан, 8A",
+  "coordinates": { "lat": 41.318337, "lng": 69.299149 },
+  "category": "atm",
+  "phones": [
+    { "value": "+998787770799", "formatted": "+998 78 777 07 99", "type": "phone" }
+  ],
+  "workingHours": "пн-пт 09:00–19:00",
+  "workingTimeRaw": [null, [{"from":{"hours":9,"minutes":0}, "to":{"hours":19,"minutes":0}}], ...],
+  "rating": 4.5,
+  "ratingCount": 10,
+  "reviewCount": 8,
+  "websites": ["https://uzumbank.uz/"],
+  "socialLinks": [
+    { "type": "telegram", "url": "https://t.me/UzumBank_Robot", "handle": "@UzumBank_Robot" },
+    { "type": "facebook", "url": "https://www.facebook.com/uzumbank", "handle": "..." }
+  ],
+  "photos": [
+    {
+      "orig": "https://avatars.mds.yandex.net/get-altay/.../orig",
+      "large": "https://avatars.mds.yandex.net/get-altay/.../XXL",
+      "thumb": "https://avatars.mds.yandex.net/get-altay/.../M",
+      "alt": "Банкомат Uzum Bank, Ташкент, фото"
+    }
+  ],
+  "photosCount": 11,
+  "logo": "https://avatars.mds.yandex.net/get-altay/.../XXL",
+  "yandexCategories": [
+    { "id": "184105402", "name": "Банкомат", "seoname": "atm", "class": "currency exchange" }
+  ],
+  "features": [
+    { "id": "cash_to_card", "name": "внесение наличных", "type": "bool", "value": true, "important": true }
+  ],
+  "featureGroups": [
+    { "name": "Доступность", "featureIds": ["wheelchair_access"] }
+  ],
+  "chain": {
+    "id": "243127652355",
+    "name": "Uzum Bank",
+    "seoname": "uzum_bank",
+    "cityCount": 292
+  },
+  "verified": true,
+  "businessProperties": { "has_verified_owner": true, ... },
+  "_source": "yandex-detail",
+  "_detailedAt": "2026-04-24T15:30:00.000Z"
 }
 ```
 
