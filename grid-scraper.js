@@ -59,6 +59,8 @@ let HEADERS = {};
 const MIN_CELL_DEG = 0.01;
 // Yandex per-request limit
 const YANDEX_LIMIT = 25;
+// Cheksiz subdivide loopdan himoya — katta bbox + global noise (mas. "парк") sababli
+const MAX_DEPTH = 8;
 
 class CaptchaError extends Error {
   constructor() { super('captcha'); this.name = 'CaptchaError'; }
@@ -139,8 +141,15 @@ function cellZoom(minLng, maxLng) {
   return Math.max(9, Math.min(17, Math.round(Math.log2(1800 / w))));
 }
 
-async function scrapeCell(bbox, query, category) {
+function isInBbox(coords, bbox) {
+  if (!coords || coords.lng == null || coords.lat == null) return false;
   const [minLng, minLat, maxLng, maxLat] = bbox;
+  return coords.lng >= minLng && coords.lng <= maxLng &&
+         coords.lat >= minLat && coords.lat <= maxLat;
+}
+
+async function scrapeCell(cellBbox, viloyatBbox, query, category) {
+  const [minLng, minLat, maxLng, maxLat] = cellBbox;
   const ll = [((minLng + maxLng) / 2).toFixed(5), ((minLat + maxLat) / 2).toFixed(5)];
   const z = cellZoom(minLng, maxLng);
   const url = `https://yandex.uz/maps/?ll=${ll[0]},${ll[1]}&z=${z}&text=${encodeURIComponent(query)}`;
@@ -148,24 +157,27 @@ async function scrapeCell(bbox, query, category) {
   reqCount++;
   const { status, body } = await get(url);
 
-  if (status !== 200) return [];
+  if (status !== 200) return { items: [], hitLimit: false };
   const raw = extractItems(body);
-  return raw.map(it => normalizeItem(it, category));
+  const all = raw.map(it => normalizeItem(it, category));
+  const items = all.filter(p => isInBbox(p.coordinates, viloyatBbox));
+  // hitLimit Yandex truncationni aniqlaydi (RAW count, filtrgacha) — split kerakmi-yo'qmi shu bilan hal
+  return { items, hitLimit: all.length >= YANDEX_LIMIT };
 }
 
 // Adaptive quadtree — rekursiv
-async function scrapeAdaptive(bbox, query, category, seen, results, save, depth = 0) {
-  const [minLng, minLat, maxLng, maxLat] = bbox;
+async function scrapeAdaptive(cellBbox, viloyatBbox, query, category, seen, results, save, depth = 0) {
+  const [minLng, minLat, maxLng, maxLat] = cellBbox;
   const cellW = maxLng - minLng;
   const cellH = maxLat - minLat;
   const indent = '  '.repeat(depth);
 
-  let items;
+  let cell;
   let attempt = 0;
   while (true) {
     attempt++;
     try {
-      items = await scrapeCell(bbox, query, category);
+      cell = await scrapeCell(cellBbox, viloyatBbox, query, category);
       break;
     } catch (e) {
       if (e.name === 'CaptchaError') {
@@ -188,20 +200,24 @@ async function scrapeAdaptive(bbox, query, category, seen, results, save, depth 
     }
   }
 
+  const { items, hitLimit } = cell;
   const newItems = items.filter(it => it.yandexId && !seen.has(it.yandexId));
   newItems.forEach(it => { seen.add(it.yandexId); results.push(it); });
   if (newItems.length > 0) save();
 
-  const tag = items.length >= YANDEX_LIMIT ? '⚡split' : '✓';
+  const tag = hitLimit ? '⚡split' : '✓';
   process.stdout.write(
     `${indent}[${reqCount}] ${cellW.toFixed(3)}°×${cellH.toFixed(3)}° → ${items.length} item, ${newItems.length} yangi ${tag}\n`
   );
 
-  // 25 limitga yetdi va cell kichraytirish mumkin — 4 ga bo'lamiz
-  // Lekin agar 0 yangi POI qaytgan bo'lsa va cell kichik (~2km) — saturation, subdivide shart emas
-  const saturated = newItems.length === 0 && cellW <= 0.02;
+  // Subdivide qilamiz faqat agar:
+  // - Yandex 25 ga to'liq qaytargan (ko'proq POI yashiringan bo'lishi mumkin)
+  // - Cell hali MIN_CELL dan katta
+  // - Bu hujayrada kamida 1 ta yangi POI bor (saturated emas) — siblings/parent allaqachon hammasini qoplagan bo'lsa, kichraytirish foydasiz
+  // - MAX_DEPTH ga yetmagan (cheksiz loop himoyasi)
+  const saturated = newItems.length === 0;
 
-  if (items.length >= YANDEX_LIMIT && cellW > MIN_CELL_DEG && cellH > MIN_CELL_DEG && !saturated) {
+  if (hitLimit && cellW > MIN_CELL_DEG && cellH > MIN_CELL_DEG && !saturated && depth < MAX_DEPTH) {
     const midLng = (minLng + maxLng) / 2;
     const midLat = (minLat + maxLat) / 2;
     const quads = [
@@ -212,7 +228,7 @@ async function scrapeAdaptive(bbox, query, category, seen, results, save, depth 
     ];
     for (const q of quads) {
       await sleep(250 + Math.random() * 150);
-      await scrapeAdaptive(q, query, category, seen, results, save, depth + 1);
+      await scrapeAdaptive(q, viloyatBbox, query, category, seen, results, save, depth + 1);
     }
   } else {
     await sleep(250 + Math.random() * 150);
@@ -285,7 +301,7 @@ async function main() {
 
       const save = () => fs.writeFileSync(outFile, JSON.stringify(results, null, 2));
       const reqsBefore = reqCount;
-      await scrapeAdaptive(viloyat.bbox, query, preset.category, seen, results, save);
+      await scrapeAdaptive(viloyat.bbox, viloyat.bbox, query, preset.category, seen, results, save);
       const pairMs = ((Date.now() - tPair) / 1000).toFixed(1);
       const pairReqs = reqCount - reqsBefore;
 
