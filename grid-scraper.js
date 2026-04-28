@@ -55,12 +55,17 @@ const VILOYATLAR = {
 
 let HEADERS = {};
 
-// ~1km minimal cell — bundan kichik bo'lsa subdivide to'xtaydi
-const MIN_CELL_DEG = 0.01;
+// ~300m minimal cell — bundan kichik bo'lsa subdivide to'xtaydi
+// (zich shaharda 1km hujayrada 25+ POI sig'maydi)
+const MIN_CELL_DEG = 0.003;
 // Yandex per-request limit
 const YANDEX_LIMIT = 25;
 // Cheksiz subdivide loopdan himoya — katta bbox + global noise (mas. "парк") sababli
-const MAX_DEPTH = 8;
+// 4^10 = 1M cell, kifoya
+const MAX_DEPTH = 10;
+// Saturated check faqat kichik cell larda — katta cell uchun har doim subdivide
+// (parent overlap → child da yangi POI chiqishi mumkin)
+const SATURATION_CELL_THRESHOLD = 0.02;
 
 class CaptchaError extends Error {
   constructor() { super('captcha'); this.name = 'CaptchaError'; }
@@ -213,9 +218,10 @@ async function scrapeAdaptive(cellBbox, viloyatBbox, query, category, seen, resu
   // Subdivide qilamiz faqat agar:
   // - Yandex 25 ga to'liq qaytargan (ko'proq POI yashiringan bo'lishi mumkin)
   // - Cell hali MIN_CELL dan katta
-  // - Bu hujayrada kamida 1 ta yangi POI bor (saturated emas) — siblings/parent allaqachon hammasini qoplagan bo'lsa, kichraytirish foydasiz
   // - MAX_DEPTH ga yetmagan (cheksiz loop himoyasi)
-  const saturated = newItems.length === 0;
+  // - Saturated emas: faqat kichik cell (~2km dan kichik) da newItems=0 bo'lsa to'xtatamiz.
+  //   Katta cell larda parent overlap normal — chuqurroq cell da har doim yangi POI chiqishi mumkin.
+  const saturated = newItems.length === 0 && cellW <= SATURATION_CELL_THRESHOLD;
 
   if (hitLimit && cellW > MIN_CELL_DEG && cellH > MIN_CELL_DEG && !saturated && depth < MAX_DEPTH) {
     const midLng = (minLng + maxLng) / 2;
